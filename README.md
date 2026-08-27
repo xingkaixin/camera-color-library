@@ -1,60 +1,62 @@
-# 色彩手记 · Color Library
+# Color Library
 
-把现实里的颜色，收藏成一本私人画册。原生 SwiftUI iOS MVP，全流程端侧运行，无服务器、无账号、无第三方运行依赖。
+English · [简体中文](README_en.md)
 
-## 运行
+Turn colors from the real world into a personal visual journal. A native SwiftUI iOS MVP that runs entirely on device, with no server, account, or third-party runtime dependencies.
 
-用 Xcode 打开 `ColorLibrary.xcodeproj`，选择 **ColorLibrary** scheme 和 iPhone 模拟器，点击 Run。最低支持 iOS 17；工程使用 Swift 6，需要 Xcode 16 或更高版本。
+## Getting started
 
-真机运行时，在 Signing & Capabilities 中选择自己的 Development Team。仓库没有配置个人签名信息。
+Open `ColorLibrary.xcodeproj` in Xcode, select the **ColorLibrary** scheme and an iPhone simulator, then click Run. The deployment target is iOS 17. The project uses Swift 6 and requires Xcode 16 or later.
 
-工程配置的源文件是 `project.yml`。增删文件后可用 [XcodeGen](https://github.com/yonaskolb/XcodeGen) 重新生成：
+To run on a physical device, select your own Development Team under Signing & Capabilities. The repository does not include personal signing settings.
+
+The project configuration lives in `project.yml`. After adding or removing files, you can regenerate the Xcode project with [XcodeGen](https://github.com/yonaskolb/XcodeGen):
 
 ```sh
 xcodegen generate
 ```
 
-已提交生成后的工程，日常打开运行不需要安装 XcodeGen。
+The generated Xcode project is committed, so XcodeGen is not required to open and run the app.
 
-## MVP 范围
+## MVP scope
 
-- **实时取色**：后置摄像头中央区域采样，剔除局部高光和极暗噪声，通道中位数 + OKLab 时间平滑；支持曝光与白平衡锁定，显示 HEX / RGB。
-- **照片配色**：系统照片选择器导入，或对相机视频画面拍摄快照；转为 sRGB，按 OKLab 距离聚类，输出最多 5 种主要颜色及近似面积占比。纯色照片只产生一个颜色，不人为凑满。
-- **本地收藏**：名称、收藏夹、色值、日期和照片副本；支持搜索、单色/配色筛选、修改名称/收藏夹、删除。
-- **分享卡**：照片 + 色带 + HEX + 标题的原生排版，渲染为 1038 像素宽的图片，通过系统分享面板导出。
-- **离线示例**：两张 AI 生成的摄影明确标为示例，不预填用户收藏。点按后运行真实提取算法。
+- **Live color capture**: Samples the center of the rear camera image, filters local highlights and very dark noise, and combines per-channel medians with temporal smoothing in OKLab. Supports exposure and white balance locking, with HEX and RGB values.
+- **Photo palettes**: Imports a photo through the system photo picker or captures a snapshot of the camera video feed. Converts the image to sRGB and clusters colors by OKLab distance, returning up to five main colors with approximate area proportions. Solid-color images produce a single color instead of padding the palette.
+- **Local library**: Saves names, collections, color values, dates, and photo copies. Supports search, single-color/palette filters, name and collection editing, and deletion.
+- **Share cards**: Combines the photo, color strip, HEX values, and title into a native layout, rendered as a 1038-pixel-wide image and exported through the system share sheet.
+- **Offline examples**: Two AI-generated photographs are clearly labeled as examples and do not prepopulate the user's library. Tapping one runs the real extraction algorithm.
 
-没有加入颜色语义命名、物体反射色估计、P3 输出、审美统计、云同步、设计 token 或商业色库。它们不是首版核心闭环。
+Semantic color naming, surface color estimation, P3 output, aesthetic statistics, cloud sync, design tokens, and commercial color libraries are outside the first release's core workflow.
 
-## 颜色与隐私边界
+## Color accuracy and privacy
 
-数值表示当前影像的 sRGB 颜色，不是经过校准的物体表面色；光源、HDR、白平衡与曝光都会影响结果。照片导入会处理 EXIF 方向，并将广色域内容映射到 sRGB；超出色域的颜色可能被裁剪。配色占比来自降采样聚类，是近似值。相机首版保存 720p 视频帧快照，不承诺全分辨率静态摄影。
+Values describe the sRGB colors in the current image, not calibrated surface colors. Lighting, HDR, white balance, and exposure all affect the result. Photo import handles EXIF orientation and maps wide-gamut content to sRGB; out-of-gamut colors may be clipped. Palette proportions are estimates from downsampled clustering. The MVP saves 720p video-frame snapshots, not full-resolution still photographs.
 
-照片选择器只提供用户选中的照片，不需要整个图库的读取权限。相机权限仅在进入捕捉页面时请求。生成的分享卡只有用户主动操作系统面板时才会外发。App 本身没有网络请求、广告或分析 SDK。
+The photo picker provides only the photos the user selects, without requiring access to the entire library. Camera permission is requested only when entering the capture screen. Share cards leave the device only through an explicit user action in the system share sheet. The app itself makes no network requests and includes no advertising or analytics SDKs.
 
-收藏位于沙盒 `Documents/ColorLibrary`：`library.json` 为唯一元数据源，照片按 UUID 存放。元数据原子写入，成功后才更新内存；删除先提交元数据再清理照片。无法解码的原文件不会被空库覆盖。卸载会删除本地收藏，分享卡不是可恢复的数据库备份。
+The library is stored in the app sandbox at `Documents/ColorLibrary`. The sole metadata source is `library.json`, and photos are stored by UUID. Metadata is written atomically before in-memory state is updated; deletion commits the metadata change before removing the photo. An unreadable metadata file is never overwritten with an empty library. Uninstalling the app deletes local collections, and share cards are not restorable database backups.
 
-## 代码结构
+## Code structure
 
 ```text
-Sources/ColorKit/        sRGB / OKLab、提取、稳定采样、收藏数据与持久化
-Tests/ColorKitTests/     跨平台可运行的算法与存储测试
+Sources/ColorKit/        sRGB / OKLab, extraction, stable sampling, library models and persistence
+Tests/ColorKitTests/     Algorithm and storage tests runnable across platforms
 ColorLibrary/
-  App/                  App 入口与关于页
-  Capture/              相机资源、图像处理、导入与保存流程
-  Library/              收藏首页、详情、编辑与筛选
-  Sharing/              分享卡排版与系统分享面板
-  Design/               少量共用视觉组件
-  Resources/            离线素材、图标与隐私声明
-ColorLibraryTests/       图片解码与分享渲染测试
-ColorLibraryUITests/     模拟器端到端测试
+  App/                  App entry point and about screen
+  Capture/              Camera resources, image processing, import and save flows
+  Library/              Library home, details, editing and filters
+  Sharing/              Share card layout and system share sheet
+  Design/               Small shared visual components
+  Resources/            Offline assets, app icon and privacy manifest
+ColorLibraryTests/      Image decoding and share rendering tests
+ColorLibraryUITests/    End-to-end simulator tests
 ```
 
-相机资源只在单一串行队列读写；UI 状态属于 MainActor。图片降采样与聚类在后台任务执行。收藏夹列表、计数、单色/配色类型均从收藏记录推导，不维护第二份状态。
+Camera resources are accessed only on a single serial queue, while UI state belongs to MainActor. Image downsampling and clustering run in background tasks. Collection lists, counts, and single-color/palette types are derived from saved entries rather than duplicated as separate state.
 
-## 验证
+## Validation
 
-应用构建成功，16 项测试通过（7 项核心、7 项图像、2 项 UI）。执行详情与真机验收边界见 [验证记录](docs/validation.md)。
+The app builds successfully, and all 16 tests passed: 7 core tests, 7 image tests, and 2 UI tests. See the [validation record](docs/validation.md) (in Chinese) for execution details and physical-device testing still required.
 
 ```sh
 swift test
@@ -63,14 +65,14 @@ xcodebuild -project ColorLibrary.xcodeproj -scheme ColorLibrary \
   -derivedDataPath build -parallel-testing-enabled NO test CODE_SIGNING_ALLOWED=NO
 ```
 
-UI 测试会使用独立 UUID 目录，不会清空正常收藏。模拟器无摄像头时仍可走通导入/示例、保存、重启读取和分享流程。
+UI tests use isolated UUID directories and do not clear the user's regular library. The import/example, save, relaunch-and-load, and sharing flows remain available in a simulator without a camera.
 
-真机验收仍需检查：首次允许/拒绝相机权限、曝光锁定、真实光线下取色稳定性、切后台/相机中断恢复、系统分享保存照片。模拟器测试不能代替这些硬件验证。
+Physical-device checks are still needed for first-time camera permission approval and denial, exposure locking, capture stability under real lighting, backgrounding and camera interruption recovery, and saving photos through the system share sheet. Simulator tests do not replace hardware validation.
 
-## 设计与素材
+## Design and assets
 
-实际界面：[首页](docs/screenshots/home.png) · [分享预览](docs/screenshots/share-preview.png) · [导出卡片](docs/screenshots/share-card.png)。
+Actual app output: [Home](docs/screenshots/home.png) · [Share preview](docs/screenshots/share-preview.png) · [Exported card](docs/screenshots/share-card.png).
 
-界面为暖白纸感、墨绿重点色和摄影画册式卡片。图标由 `scripts/make-app-icon.swift` 确定性生成。两张示例摄影通过内置 imagegen 生成，提示词和路径见 [素材说明](docs/assets.md)。
+The interface combines warm off-white surfaces, dark green accents, and photo-journal cards. The app icon is generated deterministically by `scripts/make-app-icon.swift`. The two sample photographs were generated with the built-in imagegen tool; prompts and asset paths are documented in the [asset notes](docs/assets.md) (in Chinese).
 
-颜色转换使用 [Björn Ottosson 公布的 OKLab 矩阵](https://bottosson.github.io/posts/oklab/)。相机使用 [AVFoundation](https://developer.apple.com/documentation/avfoundation/avcapturesession)，图库导入使用系统 PhotosPicker。
+Color conversion uses the [OKLab matrices published by Björn Ottosson](https://bottosson.github.io/posts/oklab/). Camera capture uses [AVFoundation](https://developer.apple.com/documentation/avfoundation/avcapturesession), and photo import uses the system PhotosPicker.
