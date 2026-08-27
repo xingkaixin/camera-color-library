@@ -47,6 +47,7 @@ final class CameraModel {
     }
 
     func handleInterruption() {
+        guard wantsCamera, status == .running || status == .starting else { return }
         logger.notice("Capture interrupted; discard stale color and stop the session")
         stop()
         status = .interrupted
