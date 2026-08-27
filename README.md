@@ -1,6 +1,6 @@
 # Color Library
 
-English · [简体中文](README_en.md)
+English · [简体中文](README_zh.md)
 
 Turn colors from the real world into a personal visual journal. A native SwiftUI iOS MVP that runs entirely on device, with no server, account, or third-party runtime dependencies.
 
