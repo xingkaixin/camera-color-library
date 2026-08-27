@@ -109,7 +109,9 @@ private struct ActivitySheet: UIViewControllerRepresentable {
     let image: UIImage
 
     func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: [image], applicationActivities: nil)
+        Logger(subsystem: "studio.colorlibrary.app", category: "Sharing")
+            .notice("Presenting system share sheet: \(image.size.width * image.scale) x \(image.size.height * image.scale)")
+        return UIActivityViewController(activityItems: [image], applicationActivities: nil)
     }
 
     func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}

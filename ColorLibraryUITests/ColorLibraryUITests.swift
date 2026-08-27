@@ -38,7 +38,8 @@ final class ColorLibraryUITests: XCTestCase {
         screenshot.lifetime = .keepAlways
         add(screenshot)
         app.buttons["shareImageButton"].tap()
-        XCTAssertTrue(app.buttons["Copy"].waitForExistence(timeout: 5) || app.buttons["拷贝"].exists)
+        let copyAction = app.cells.matching(NSPredicate(format: "label IN %@", ["Copy", "拷贝"])).firstMatch
+        XCTAssertTrue(copyAction.waitForExistence(timeout: 10), app.debugDescription)
     }
 
     func testCameraFallbackCanExtractSample() {
@@ -46,7 +47,7 @@ final class ColorLibraryUITests: XCTestCase {
         app.launchEnvironment["COLOR_LIBRARY_TEST_SESSION"] = UUID().uuidString
         app.launch()
         app.buttons["captureButton"].tap()
-        XCTAssertTrue(app.staticTexts["暂时没有可用的镜头"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["暂时没有可用的镜头"].waitForExistence(timeout: 10), app.debugDescription)
         app.swipeUp()
         app.buttons["cameraSampleButton"].tap()
         XCTAssertTrue(app.buttons["saveCaptureButton"].waitForExistence(timeout: 15))
