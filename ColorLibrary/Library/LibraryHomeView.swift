@@ -231,7 +231,7 @@ struct LibraryHomeView: View {
             }.accessibilityIdentifier("collectionsTab")
         }
         .padding(.top, 7).padding(.horizontal, 24)
-        .background(Theme.paper.shadow(color: .black.opacity(0.04), radius: 15, y: -5))
+        .background(Theme.paper.ignoresSafeArea(edges: .bottom).shadow(color: .black.opacity(0.04), radius: 15, y: -5))
         .overlay(alignment: .top) { Theme.line.frame(height: 0.6) }
     }
 }

@@ -54,7 +54,7 @@ ColorLibraryUITests/     模拟器端到端测试
 
 ## 验证
 
-已执行项目与尚待验证的边界见 [验证记录](docs/validation.md)。完整 UI 回归目前受本机模拟器服务异常影响，不应视为全部通过。
+应用构建成功，16 项测试通过（7 项核心、7 项图像、2 项 UI）。执行详情与真机验收边界见 [验证记录](docs/validation.md)。
 
 ```sh
 swift test
@@ -68,6 +68,8 @@ UI 测试会使用独立 UUID 目录，不会清空正常收藏。模拟器无�
 真机验收仍需检查：首次允许/拒绝相机权限、曝光锁定、真实光线下取色稳定性、切后台/相机中断恢复、系统分享保存照片。模拟器测试不能代替这些硬件验证。
 
 ## 设计与素材
+
+实际界面：[首页](docs/screenshots/home.png) · [分享预览](docs/screenshots/share-preview.png) · [导出卡片](docs/screenshots/share-card.png)。
 
 界面为暖白纸感、墨绿重点色和摄影画册式卡片。图标由 `scripts/make-app-icon.swift` 确定性生成。两张示例摄影通过内置 imagegen 生成，提示词和路径见 [素材说明](docs/assets.md)。
 
